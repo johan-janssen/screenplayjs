@@ -1,0 +1,27 @@
+{
+	"compileOnSave": true,
+	"compilerOptions": {
+		"baseUrl": "./",
+		"outDir": "./dist/",
+		"sourceMap": true,
+		"allowJs": true,
+		"resolveJsonModule": true,
+		"declaration": false,
+		"moduleResolution": "node",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"target": "es2021",
+        "types": ["node", "jasmine"],
+		"typeRoots": ["node_modules/@types"],
+		"paths": {
+			"iknl/infographics/common/*": ["common/frontend/*"]
+		},
+		"lib": ["es2021", "dom"]
+	},
+	"exclude": [
+        "node_modules",
+		"dist/**/*"
+	]
+}

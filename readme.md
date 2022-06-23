@@ -1,0 +1,1 @@
+Screenplay syntax in typescript
