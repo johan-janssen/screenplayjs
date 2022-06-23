@@ -11,8 +11,13 @@
 		"reflect-metadata": "0.1.13"
 	},
 	"devDependencies": {
-		"@angular-devkit/build-angular": "^14.0.0",
+		"@angular/common": "^14.0.0",
+		"@angular/core": "^14.0.0",
+		"@angular/compiler": "^14.0.0",
 		"@angular/compiler-cli": "^14.0.0",
+		"@angular-devkit/build-angular": "^14.0.0",
+		"@angular/platform-browser": "^14.0.0",
+		"@angular/platform-browser-dynamic": "^14.0.0",
 		"@types/jasmine": "^4.0.0",
 		"@types/node": "latest",
 		"jasmine-core": "^4.0.0",
