@@ -1,8 +1,8 @@
 //import { Builder } from 'src/engine/builder';
-import { GlobalRegistry } from '../engine/registry';
-import { CharacterDescription } from '../script/elements';
+import { GlobalRegistry } from '../src/engine/registry';
+import { CharacterDescription } from '../src/script/elements';
 import { Man } from './romeoAndJuliet/actors';
-import { Builder } from '../engine/builder'
+import { Builder } from '../src/engine/builder'
 import * as should from 'should';
 
 describe("Builder builds actors and props", () => {

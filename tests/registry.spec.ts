@@ -1,5 +1,5 @@
 import * as should from 'should';
-import { GlobalRegistry } from '../engine/registry';
+import { GlobalRegistry } from '../src/engine/registry';
 import { Man } from './romeoAndJuliet/actors';
 
 describe("Registry registers actors and props", () =>{

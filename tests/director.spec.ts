@@ -1,8 +1,8 @@
 import { script as script1 } from './script1';
-import { Loader } from '../script/loader'
-import {  Builder, Director } from '../engine/builder';
-import { Set } from '../engine/set';
-import { GlobalRegistry } from '../engine/registry';
+import { Loader } from '../src/script/loader'
+import {  Builder, Director } from '../src/engine/builder';
+import { Set } from '../src/engine/set';
+import { GlobalRegistry } from '../src/engine/registry';
 import { Man } from './romeoAndJuliet/actors';
 import * as should from 'should';
 

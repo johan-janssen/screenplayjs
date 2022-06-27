@@ -1,6 +1,6 @@
 import { script as script1 } from './script1';
-import { CharacterDescription, SceneSection} from '../script/elements'
-import { Loader, ScreenPlay } from '../script/loader';
+import { CharacterDescription, SceneSection} from '../src/script/elements'
+import { Loader, ScreenPlay } from '../src/script/loader';
 import * as should from 'should';
 
 describe("Loader with script1", () =>{
@@ -45,4 +45,14 @@ describe("Loader with script1", () =>{
         should(definition1.name).equal('SAMPSON')
         should(definition2.name).equal('GREGORY')
     });
+
+    it('should load attributes', () => {
+        const definition1 = scene1.actions[0] as CharacterDescription;
+        should(definition1.attributes).lengthOf(2);
+    });
+
+    // it('should reference entities in properties'), () => {
+    //     const definition1 = scene1.actions[0] as CharacterDescription;
+    //     should(definition1.attributes[0].references[0])
+    // }
 });

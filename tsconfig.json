@@ -12,13 +12,13 @@
 		"experimentalDecorators": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
-		"target": "es2021",
+		"target": "es2020",
         "types": ["node", "mocha", "should"],
 		"typeRoots": ["node_modules/@types"],
 		"paths": {
 			"screenplayjs/*": ["*"]
 		},
-		"lib": ["es2021", "dom"]
+		"lib": ["es2020", "dom"]
 	},
 	"exclude": [
         "node_modules",
