@@ -1,25 +1,28 @@
-import { Builder } from 'src/engine/builder';
-import { GlobalRegistry } from 'src/engine/registry';
-import { CharacterDescription } from 'src/script/elements';
+//import { Builder } from 'src/engine/builder';
+import { GlobalRegistry } from '../engine/registry';
+import { CharacterDescription } from '../script/elements';
 import { Man } from './romeoAndJuliet/actors';
+import { Builder } from '../engine/builder'
+import * as should from 'should';
 
-describe("Builder builds actors and props", () =>{
+describe("Builder builds actors and props", () => {
     GlobalRegistry.Register(Man);
     const builder = new Builder(GlobalRegistry);
 
-    beforeAll(() => {
+    before(() => {
         
     });
 
-    it("Builds a man", () =>{
+    it("Builds a man", () => {
         const line = 'SAMPSON, a man, of the house of Capulet, armed with SWORD and BUCKLER'
         const description = new CharacterDescription(
             line, 
             'SAMPSON', 
             'man', 
             ['of the house of Capulet', 'armed with SWORD and BUCKLER']);
-        const built = builder.buildCharacter(description);
-        expect(built).toBeInstanceOf(Man)
-        expect(built.house).toBe('Capulet');
+        const built = builder.buildCharacter(description) as Man;
+
+        should(built).instanceof(Man)
+        should(built.house).equals('Capulet')
     });
 });

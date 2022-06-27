@@ -1,9 +1,11 @@
 import { script as script1 } from './script1';
 import { Loader } from '../script/loader'
-import {  Builder, Director } from 'src/engine/builder';
-import { Set } from 'src/engine/set';
-import { GlobalRegistry } from 'src/engine/registry';
+import {  Builder, Director } from '../engine/builder';
+import { Set } from '../engine/set';
+import { GlobalRegistry } from '../engine/registry';
 import { Man } from './romeoAndJuliet/actors';
+import { before } from 'mocha';
+import * as should from 'should';
 
 describe("Director directs script1", () =>{
     let director: Director = null;
@@ -11,7 +13,7 @@ describe("Director directs script1", () =>{
     let builder = new Builder(GlobalRegistry);
     GlobalRegistry.Register(Man);
 
-    beforeAll(() => {
+    before(() => {
         const loader = new Loader();
         const screenPlay = loader.Load(script1)
         director = new Director(screenPlay, set, builder);
@@ -20,6 +22,7 @@ describe("Director directs script1", () =>{
     it("start directing", () =>{
         console.log(GlobalRegistry);
         director.start();
-        expect(director.next()).toBe(true);
+
+        should(director.next()).eql(true);
     });
 });

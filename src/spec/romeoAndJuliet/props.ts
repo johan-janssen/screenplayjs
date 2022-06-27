@@ -1,4 +1,4 @@
-import { Prop } from "src/engine/prop";
+import { Prop } from "../../engine/prop";
 
 @Prop('sword', {appearance: '{0}', sharpness: '{1}'})
 export class Sword {

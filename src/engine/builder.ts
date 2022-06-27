@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-import { CharacterDescription, SceneSection } from 'src/script/elements';
-import { ScreenPlay } from 'src/script/loader';
+import { CharacterDescription, SceneSection } from '../script/elements';
+import { ScreenPlay } from '../script/loader';
 import { Registry } from './registry';
 import { Set } from './set';
 

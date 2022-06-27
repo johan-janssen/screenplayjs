@@ -1,12 +1,13 @@
 import { script as script1 } from './script1';
 import { CharacterDescription, SceneSection} from '../script/elements'
-import { Loader, ScreenPlay } from 'src/script/loader';
+import { Loader, ScreenPlay } from '../script/loader';
+import * as should from 'should';
 
 describe("Loader with script1", () =>{
     let screenPlay: ScreenPlay = null;
     let scene1: SceneSection = null;
 
-    beforeAll(() => {
+    before(() => {
         const loader = new Loader();
         screenPlay = loader.Load(script1)
         console.log(screenPlay);
@@ -14,34 +15,34 @@ describe("Loader with script1", () =>{
     });
 
     it("should load top level elements", () =>{
-        expect(screenPlay.acts).toHaveSize(2);
-        expect(screenPlay.sets).toHaveSize(1);
+        should(screenPlay.acts).lengthOf(2);
+        should(screenPlay.sets).lengthOf(1);
     });
 
     it("should extract act names", () =>{
-        expect(screenPlay.acts[0].heading).toBe('1');
-        expect(screenPlay.acts[1].heading).toBe('2');
+        should(screenPlay.acts[0].heading).equal('1');
+        should(screenPlay.acts[1].heading).equal('2');
     });
 
     it("should extract scene names", () =>{
-        expect(screenPlay.acts[0].scenes[0].heading).toBe('1');
-        expect(screenPlay.acts[0].scenes[1].heading).toBe('2');
-        expect(screenPlay.acts[1].scenes[0].heading).toBe('2.1');
+        should(screenPlay.acts[0].scenes[0].heading).equal('1');
+        should(screenPlay.acts[0].scenes[1].heading).equal('2');
+        should(screenPlay.acts[1].scenes[0].heading).equal('2.1');
     });
 
     it('should load scenes', () => {
-        expect(screenPlay.acts[0].scenes).toHaveSize(2)
-        expect(screenPlay.acts[1].scenes).toHaveSize(1)
+        should(screenPlay.acts[0].scenes).lengthOf(2)
+        should(screenPlay.acts[1].scenes).lengthOf(1)
     });
 
     it('should put lines into scenes', () => {
-        expect(scene1.lines.length).toBe(14);
+        should(scene1.lines).lengthOf(14);
     });
 
     it('should extract character definitions', () => {
         const definition1 = scene1.actions[0] as CharacterDescription;
         const definition2 = scene1.actions[1] as CharacterDescription;
-        expect(definition1.name).toBe('SAMPSON')
-        expect(definition2.name).toBe('GREGORY')
+        should(definition1.name).equal('SAMPSON')
+        should(definition2.name).equal('GREGORY')
     });
 });

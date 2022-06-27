@@ -1,7 +1,7 @@
 {
 	"compileOnSave": true,
 	"compilerOptions": {
-		"baseUrl": "./",
+		"baseUrl": "src",
 		"outDir": "./dist/",
 		"sourceMap": true,
 		"allowJs": true,
@@ -13,10 +13,10 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"target": "es2021",
-        "types": ["node", "jasmine"],
+        "types": ["node", "mocha", "should"],
 		"typeRoots": ["node_modules/@types"],
 		"paths": {
-			"iknl/infographics/common/*": ["common/frontend/*"]
+			"screenplayjs/*": ["*"]
 		},
 		"lib": ["es2021", "dom"]
 	},

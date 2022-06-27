@@ -1,4 +1,4 @@
-import { Action, Character, Property } from "src/engine/character";
+import { Action, Character, Property } from "../../engine/character";
 import { Sword } from "./props";
 
 @Character('man', [/of the house of ([a-zA-Z ]*)$/])
