@@ -1,6 +1,6 @@
 import { Builder } from 'src/engine/builder';
 import { GlobalRegistry } from 'src/engine/registry';
-import { CharacterDescription } from 'src/loader';
+import { CharacterDescription } from 'src/script/elements';
 import { Man } from './romeoAndJuliet/actors';
 
 describe("Builder builds actors and props", () =>{

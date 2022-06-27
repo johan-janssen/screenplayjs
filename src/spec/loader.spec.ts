@@ -1,9 +1,10 @@
 import { script as script1 } from './script1';
-import { CharacterDescription, Loader, SceneDefinition, ScreenPlay } from '../loader'
+import { CharacterDescription, SceneSection} from '../script/elements'
+import { Loader, ScreenPlay } from 'src/script/loader';
 
 describe("Loader with script1", () =>{
     let screenPlay: ScreenPlay = null;
-    let scene1: SceneDefinition = null;
+    let scene1: SceneSection = null;
 
     beforeAll(() => {
         const loader = new Loader();
@@ -18,14 +19,14 @@ describe("Loader with script1", () =>{
     });
 
     it("should extract act names", () =>{
-        expect(screenPlay.acts[0].name).toBe('1');
-        expect(screenPlay.acts[1].name).toBe('2');
+        expect(screenPlay.acts[0].heading).toBe('1');
+        expect(screenPlay.acts[1].heading).toBe('2');
     });
 
     it("should extract scene names", () =>{
-        expect(screenPlay.acts[0].scenes[0].name).toBe('1');
-        expect(screenPlay.acts[0].scenes[1].name).toBe('2');
-        expect(screenPlay.acts[1].scenes[0].name).toBe('2.1');
+        expect(screenPlay.acts[0].scenes[0].heading).toBe('1');
+        expect(screenPlay.acts[0].scenes[1].heading).toBe('2');
+        expect(screenPlay.acts[1].scenes[0].heading).toBe('2.1');
     });
 
     it('should load scenes', () => {

@@ -1,53 +1,11 @@
 // https://www.studiobinder.com/blog/brilliant-script-screenplay-format/
 
-export class MultiLineElement {
-    public readonly lines: Array<string> = [];
-}
+import { ActSection, CharacterCue, CharacterDescription, PropDescription, PropSection, SceneSection, SetDefinition } from "./elements";
 
-export class PropSection extends MultiLineElement {
-    public props = new Map<string, PropDescription>();
-}
 
-export class ObjectDescription {}
-
-export class PropDescription {
-    constructor(public readonly line: string, public readonly name: string, public readonly type: string, public readonly properties: string) {}
-}
-
-export class SetDefinition extends MultiLineElement {
-    constructor(public readonly line: string, public readonly name: string) {
-        super();
-    }
-}
-
-export class ActDefinition extends MultiLineElement {
-    public readonly scenes: Array<SceneDefinition> = [];
-
-    constructor(public readonly line: string, public readonly name: string) {
-        super();
-    }
-}
-
-export class SceneDefinition extends MultiLineElement {
-    public readonly actions: Array<CharacterDescription | CharacterCue> = [];
-
-    constructor(public readonly line: string, public readonly name: string) {
-        super();
-    }
-}
-
-export class CharacterDescription {
-    constructor(public readonly line: string, public readonly name: string, public readonly type: string, public readonly properties: Array<string>) {}
-}
-
-export class CharacterCue extends MultiLineElement {
-    constructor(public readonly line: string, public readonly character: CharacterDescription) {
-        super();
-    }
-}
 
 export class ScreenPlay {
-    constructor(public readonly acts: Array<ActDefinition>, public readonly sets: Array<SetDefinition>, public readonly props: PropSection) {}
+    constructor(public readonly acts: Array<ActSection>, public readonly sets: Array<SetDefinition>, public readonly props: PropSection) {}
 }
 
 export class Parsing {
@@ -61,12 +19,23 @@ export class Parsing {
     public static readonly characterCue = Parsing.nameGroup + '$'
 }
 
-export class BagOfStuff {
-    allStuff = new Map<string, CharacterDescription | PropDescription>();
-    public Add(thing: CharacterDescription | PropDescription ) {
+export class NamedElementsBag {
+    private allStuff = new Map<string, {name}>();
+
+    constructor(joinWith: NamedElementsBag=null) {
+        if (joinWith) {
+            joinWith.forEach((v) => this.Add(v));
+        }
+    }
+
+    public forEach(callbackfn: (value: {name}, key: string, map: Map<string, {name}>) => void): void {
+        return this.allStuff.forEach(callbackfn);
+    }
+
+    public Add(thing: {name} ) {
         const name = thing.name;
         if (this.allStuff.has(name)) {
-            throw 'Bag already has stuff: ' + name;
+            throw 'Bag already has element: ' + name;
         }
         this.allStuff.set(name, thing);
     }
@@ -89,10 +58,10 @@ export class BagOfStuff {
 export class Loader {
     public Load(script: string): ScreenPlay {
         const lines = script.split('\n');
-        const acts: Array<ActDefinition> = [];
+        const acts: Array<ActSection> = [];
         const sets: Array<SetDefinition> = [];
         let propSection: PropSection= null;
-        const stuff = new BagOfStuff();
+        const stuff = new NamedElementsBag();
 
         const topLevelElements: Array<{regex: string, func: (line: string, match: RegExpMatchArray)=>any}> = [
             {
@@ -106,7 +75,7 @@ export class Loader {
             {
                 regex: Parsing.actDefinition, 
                 func: (line: string, match: RegExpMatchArray) => {
-                    const act = new ActDefinition(line, match.groups.name);
+                    const act = new ActSection(line, match.groups.name);
                     acts.push(act)
                     return act;
                 }
@@ -130,7 +99,7 @@ export class Loader {
                 {
                     regex: Parsing.sceneDefinition, 
                     func: (line: string, match: RegExpMatchArray) => {
-                        const scene = new SceneDefinition(line, match.groups.name);
+                        const scene = new SceneSection(line, match.groups.name);
                         act.scenes.push(scene);
                         return scene;
                     }
@@ -182,7 +151,7 @@ export class Loader {
         });
     }
 
-    private ParseScene(scene: SceneDefinition, characters: Map<string, CharacterDescription>) {
+    private ParseScene(scene: SceneSection, characters: Map<string, CharacterDescription>) {
         const expectedElements: Array<{regex: string, func: (line: string, match: RegExpMatchArray)=>any}> = [
             {
                 regex: Parsing.characterDescription, 
@@ -201,7 +170,7 @@ export class Loader {
                     if (!characters.has(name)) {
                         this.OnError('Character ' + name + 'not defined')
                     }
-                    return new CharacterCue(line, characters.get(name));
+                    return new CharacterCue(line, name, characters.get(name));
                 }
             },
         ];
@@ -230,7 +199,7 @@ export class Loader {
         for (let i=0; i<lines.length; i++) {
             const line = lines[i];
             if (this.IsEmptyLine(line)) {
-                if (currentElement && currentElement instanceof MultiLineElement) {
+                if (currentElement && currentElement.lines) {
                     currentElement.lines.push(line);
                 }
                 continue;
@@ -254,7 +223,7 @@ export class Loader {
                 currentElement = newElement;
             }
             else {
-                if (currentElement && currentElement instanceof MultiLineElement) {
+                if (currentElement && currentElement.lines) {
                     currentElement.lines.push(line);
                 }
                 else {

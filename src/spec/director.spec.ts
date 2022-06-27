@@ -1,5 +1,5 @@
 import { script as script1 } from './script1';
-import { Loader } from '../loader'
+import { Loader } from '../script/loader'
 import {  Builder, Director } from 'src/engine/builder';
 import { Set } from 'src/engine/set';
 import { GlobalRegistry } from 'src/engine/registry';

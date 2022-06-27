@@ -1,5 +1,6 @@
 import 'reflect-metadata';
-import { CharacterDescription, SceneDefinition, ScreenPlay } from 'src/loader';
+import { CharacterDescription, SceneSection } from 'src/script/elements';
+import { ScreenPlay } from 'src/script/loader';
 import { Registry } from './registry';
 import { Set } from './set';
 
@@ -46,7 +47,7 @@ export class Builder {
 
 export class Director {
     private currentLine = -1;
-    private currentScene: SceneDefinition = null
+    private currentScene: SceneSection = null
 
     constructor(public readonly screenplay: ScreenPlay, public readonly set: Set, public readonly builder: Builder) {
 
