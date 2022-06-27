@@ -4,7 +4,6 @@ import {  Builder, Director } from '../engine/builder';
 import { Set } from '../engine/set';
 import { GlobalRegistry } from '../engine/registry';
 import { Man } from './romeoAndJuliet/actors';
-import { before } from 'mocha';
 import * as should from 'should';
 
 describe("Director directs script1", () =>{
