@@ -1,6 +1,6 @@
 //import { Builder } from 'src/engine/builder';
 import { GlobalRegistry } from '../src/engine/registry';
-import { CharacterDescription } from '../src/script/elements';
+import { Attribute, CharacterDescription } from '../src/script/elements';
 import { Man } from './romeoAndJuliet/actors';
 import { Builder } from '../src/engine/builder'
 import * as should from 'should';
@@ -19,7 +19,7 @@ describe("Builder builds actors and props", () => {
             line, 
             'SAMPSON', 
             'man', 
-            ['of the house of Capulet', 'armed with SWORD and BUCKLER']);
+            [new Attribute('of the house of Capulet', []), new Attribute('armed with SWORD and BUCKLER', [])]);
         const built = builder.buildCharacter(description) as Man;
 
         should(built).instanceof(Man)

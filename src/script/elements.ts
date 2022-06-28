@@ -1,5 +1,5 @@
-interface IElement {
-
+interface INamedElement {
+    readonly name: string;
 }
 
 interface ISection {
@@ -7,20 +7,20 @@ interface ISection {
     readonly lines: Array<string>;
 }
 
-interface IAttribute {
-    references: Array<IReference>;
+export class Attribute {
+    constructor(public readonly line: string, public readonly references: Array<Reference>) {}
 }
 
-interface IReference {
-    element: IElement
-    index: number;
-    length: number;
+export class Reference {
+    constructor(public readonly element: INamedElement, public readonly index: number, public readonly length: number) {
+
+    }
 }
 
 interface IDescriptionElement {
     readonly name: string;
     readonly type: string;
-    readonly attributes: Array<IAttribute>;
+    readonly attributes: Array<Attribute>;
 }
 
 export class PropSection implements ISection {
@@ -32,8 +32,7 @@ export class PropSection implements ISection {
 export class ObjectDescription {}
 
 export class PropDescription implements IDescriptionElement {
-    public readonly attributes: Array<IAttribute> = [];
-    constructor(public readonly line: string, public readonly name: string, public readonly type: string, public readonly properties: string) {}
+    constructor(public readonly line: string, public readonly name: string, public readonly type: string, public readonly attributes: Array<Attribute>) {}
 }
 
 export class SetDefinition implements ISection {
@@ -59,8 +58,7 @@ export class SceneSection implements ISection {
 }
 
 export class CharacterDescription implements IDescriptionElement {
-    public readonly attributes: Array<IAttribute> = [];
-    constructor(public readonly line: string, public readonly name: string, public readonly type: string, public readonly properties: Array<string>) {}
+    constructor(public readonly line: string, public readonly name: string, public readonly type: string, public readonly attributes: Array<Attribute>) {}
 }
 
 export class CharacterCue implements ISection {

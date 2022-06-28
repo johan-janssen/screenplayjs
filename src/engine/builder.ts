@@ -31,8 +31,8 @@ export class Builder {
 
         character.constructorPatterns.forEach((pattern, i) => {
             if (pattern instanceof RegExp) {
-                description.properties.forEach(property => {
-                    const match = property.match(pattern);
+                description.attributes.forEach(property => {
+                    const match = property.line.match(pattern);
                     if (match) {
                         args[i] = match[1];
                     }

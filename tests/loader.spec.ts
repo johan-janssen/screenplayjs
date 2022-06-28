@@ -51,8 +51,11 @@ describe("Loader with script1", () =>{
         should(definition1.attributes).lengthOf(2);
     });
 
-    // it('should reference entities in properties'), () => {
-    //     const definition1 = scene1.actions[0] as CharacterDescription;
-    //     should(definition1.attributes[0].references[0])
-    // }
+    it('should reference entities in properties', () => {
+        const definition1 = scene1.actions[0] as CharacterDescription;
+        const references = definition1.attributes[1].references;
+        should(references).lengthOf(2);
+        should(references[0].element.name).equals('SWORD');
+        should(references[1].element.name).equals('BUCKLER');
+    });
 });

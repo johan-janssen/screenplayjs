@@ -16,7 +16,7 @@
         "types": ["node", "mocha", "should"],
 		"typeRoots": ["node_modules/@types"],
 		"paths": {
-			"screenplayjs/*": ["*"]
+			
 		},
 		"lib": ["es2020", "dom"]
 	},

@@ -1,6 +1,7 @@
 // https://www.studiobinder.com/blog/brilliant-script-screenplay-format/
 
-import { ActSection, CharacterCue, CharacterDescription, PropDescription, PropSection, SceneSection, SetDefinition } from "./elements";
+import { NamedElementsBag } from "./collection";
+import { ActSection, Attribute, CharacterCue, CharacterDescription, PropDescription, PropSection, SceneSection, SetDefinition } from "./elements";
 
 
 
@@ -19,41 +20,7 @@ export class Parsing {
     public static readonly characterCue = Parsing.nameGroup + '$'
 }
 
-export class NamedElementsBag {
-    private allStuff = new Map<string, {name}>();
 
-    constructor(joinWith: NamedElementsBag=null) {
-        if (joinWith) {
-            joinWith.forEach((v) => this.Add(v));
-        }
-    }
-
-    public forEach(callbackfn: (value: {name}, key: string, map: Map<string, {name}>) => void): void {
-        return this.allStuff.forEach(callbackfn);
-    }
-
-    public Add(thing: {name} ) {
-        const name = thing.name;
-        if (this.allStuff.has(name)) {
-            throw 'Bag already has element: ' + name;
-        }
-        this.allStuff.set(name, thing);
-    }
-
-    public Find(line: string) {
-        if (!line) {
-            return [];
-        }
-        const foundStuff = [];
-        this.allStuff.forEach((v, k) => {
-            const matches = line.match(k);
-            if (matches) {
-                foundStuff.push(v);
-            }
-        });
-        return foundStuff;
-    }
-}
 
 export class Loader {
     public Load(script: string): ScreenPlay {
@@ -61,7 +28,7 @@ export class Loader {
         const acts: Array<ActSection> = [];
         const sets: Array<SetDefinition> = [];
         let propSection: PropSection= null;
-        const stuff = new NamedElementsBag();
+        const namedElements = new NamedElementsBag();
 
         const topLevelElements: Array<{regex: string, func: (line: string, match: RegExpMatchArray)=>any}> = [
             {
@@ -91,8 +58,9 @@ export class Loader {
 
         this.MatchElements(lines, topLevelElements, () => {});
 
-
-        const characters = new Map<string, CharacterDescription>();
+        if (propSection) {
+            this.BuildProps(propSection, namedElements);
+        }
 
         acts.forEach(act => {
             const actElements: Array<{regex: string, func: (line: string, match: RegExpMatchArray)=>any}> = [
@@ -111,18 +79,9 @@ export class Loader {
 
         acts.forEach(act => {
             act.scenes.forEach(scene => {
-                this.ParseScene(scene, characters);
+                this.ParseScene(scene, namedElements);
             });
         });
-
-        if (propSection) {
-            this.ParseProps(propSection);
-        }
-
-        characters.forEach((v) => stuff.Add(v));
-        propSection.props.forEach((v) => stuff.Add(v));
-        
-        //characters.forEach((v) => stuff.Find(v.properties));
 
         return new ScreenPlay(acts, sets, propSection);
     }
@@ -131,16 +90,19 @@ export class Loader {
         console.log(message);
     }
 
-    private ParseProps(section: PropSection) {
+    private BuildProps(section: PropSection, namedElements: NamedElementsBag) {
         const expectedElements: Array<{regex: string, func: (line: string, match: RegExpMatchArray)=>any}> = [
             {
                 regex: Parsing.characterDescription, 
                 func: (line: string, match: RegExpMatchArray) => { 
-                    return new PropDescription(
+                    const attributes = this.SplitAttributes(match.groups.properties);
+                    const description = new PropDescription(
                         line,
                         match.groups.name,
                         match.groups.type,
-                        match.groups.properties);
+                        this.BuildAttributes(attributes, namedElements));
+                        namedElements.Add(description);
+                        return description;
                     }
             }
         ];
@@ -151,44 +113,56 @@ export class Loader {
         });
     }
 
-    private ParseScene(scene: SceneSection, characters: Map<string, CharacterDescription>) {
+    private ParseScene(scene: SceneSection, namedElementsOuterScope: NamedElementsBag) {
+        const namedElements = new NamedElementsBag(namedElementsOuterScope);
         const expectedElements: Array<{regex: string, func: (line: string, match: RegExpMatchArray)=>any}> = [
             {
                 regex: Parsing.characterDescription, 
-                func: (line: string, match: RegExpMatchArray) => { 
-                    return new CharacterDescription(
+                func: (line: string, match: RegExpMatchArray) => {
+                    const attributes = this.SplitAttributes(match.groups.properties);
+                    const descr = new CharacterDescription(
                         line,
                         match.groups.name,
                         match.groups.type,
-                        this.SplitProperties(match.groups.properties));
+                        this.BuildAttributes(attributes, namedElements)
+                        );
+                        namedElements.Add(descr);
+                        return descr;
                     }
             },
             {
                 regex: Parsing.characterCue, 
                 func: (line: string, match: RegExpMatchArray) => {
                     const name = match.groups.name;
-                    if (!characters.has(name)) {
+                    const character = namedElements.Get(name) as CharacterDescription;
+                    if (!character || !(character instanceof CharacterDescription)) {
                         this.OnError('Character ' + name + 'not defined')
                     }
-                    return new CharacterCue(line, name, characters.get(name));
+                    return new CharacterCue(line, name, character);
                 }
             },
         ];
 
         this.MatchElements(scene.lines, expectedElements, (matchedElement) => {
-            if (matchedElement instanceof CharacterDescription) {
-                characters.set(matchedElement.name, matchedElement);
-            }
             scene.actions.push(matchedElement);
         });
     }
 
-    private SplitProperties(line: string): Array<string> {
+    private SplitAttributes(line: string): Array<string> {
         if (!line) {
             return [];
         }
         const properties = line.split(/[,.]/);
         return properties.map(p => p.trim());
+    }
+
+    private BuildAttributes(attributes: Array<string>, namedElements: NamedElementsBag): Array<Attribute> {
+        return attributes.map(a => this.BuildAttribute(a, namedElements));
+    }
+
+    private BuildAttribute(attribute: string, namedElements: NamedElementsBag): Attribute {
+        const references = namedElements.Find(attribute);
+        return new Attribute(attribute, references);
     }
 
     private MatchElements(lines: Array<string>, 
