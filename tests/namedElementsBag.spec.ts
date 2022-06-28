@@ -1,7 +1,5 @@
 import { NamedElementsBag } from '../src/script/collection';
 import * as should from 'should';
-import { beforeEach } from 'mocha';
-
 
 
 describe("Named elements bag", () =>{

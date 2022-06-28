@@ -1,8 +1,8 @@
-interface INamedElement {
+export interface INamedElement {
     readonly name: string;
 }
 
-interface ISection {
+export interface ISection {
     readonly heading: string;
     readonly lines: Array<string>;
 }

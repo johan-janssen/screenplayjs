@@ -1,7 +1,7 @@
-import { Reference } from "./elements";
+import { INamedElement, Reference } from "./elements";
 
 export class NamedElementsBag {
-    private allStuff = new Map<string, {name}>();
+    private allStuff = new Map<string, INamedElement>();
 
     constructor(joinWith: NamedElementsBag=null) {
         if (joinWith) {
@@ -9,11 +9,11 @@ export class NamedElementsBag {
         }
     }
 
-    public forEach(callbackfn: (value: {name}, key: string, map: Map<string, {name}>) => void): void {
+    public forEach(callbackfn: (value: INamedElement, key: string, map: Map<string, INamedElement>) => void): void {
         return this.allStuff.forEach(callbackfn);
     }
 
-    public Add(thing: {name} ) {
+    public Add(thing: INamedElement ) {
         const name = thing.name;
         if (this.allStuff.has(name)) {
             throw 'Bag already has element: ' + name;
@@ -26,24 +26,21 @@ export class NamedElementsBag {
     }
 
     public Find(line: string): Array<Reference> {
+        const foundStuff: Array<Reference> = [];
         if (!line) {
             return [];
         }
 
-        let foundStuff: Array<Reference> = [];
-        this.allStuff.forEach((v, k) => {
-            const regexString = `([, \t\\.\\!\\?"':;]|^)(?<name>${k})([, \t\\.\\!\\?"':;]|$)`;
-            const regex = new RegExp(regexString, 'g');
-            const splits = line.split(regex);
-            let idx = 0;
-            splits.forEach(split => {
-                if (split == k) {
-                    foundStuff.push(new Reference(v, idx, split.length));
-                }
-                idx += split.length;
-            });
+        this.allStuff.forEach((v) => {
+            this.FindByName(line, v).forEach(found => foundStuff.push(found));
         });
 
+        this.RemoveOverlappingFoundItems(foundStuff);
+
+        return foundStuff;
+    }
+
+    public RemoveOverlappingFoundItems(foundStuff: Array<Reference>) {
         foundStuff.sort((a, b) => { return a.index - b.index });
 
         let i = 0;
@@ -65,7 +62,25 @@ export class NamedElementsBag {
                 i++;
             }
         }
+    }
 
+    public FindByName(line: string, element: INamedElement): Array<Reference> {
+        if (!line) {
+            return [];
+        }
+
+        const name = element.name;
+        const foundStuff: Array<Reference> = [];
+        const regexString = `([, \t\\.\\!\\?"':;]|^)(?<name>${name})([, \t\\.\\!\\?"':;]|$)`;
+        const regex = new RegExp(regexString, 'g');
+        const splits = line.split(regex);
+        let idx = 0;
+        splits.forEach(split => {
+            if (split == name) {
+                foundStuff.push(new Reference(element, idx, split.length));
+            }
+            idx += split.length;
+        });
         return foundStuff;
     }
 }
