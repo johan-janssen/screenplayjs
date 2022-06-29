@@ -25,22 +25,22 @@ export class Builder {
     }
 
     public buildCharacter(description: CharacterDescription): any {
-        const character = this.registry.getCharacterByName(description.type);
+        const character = this.registry.GetCharacterByName(description.type);
 
         const args = new Array(character.ctorArguments.length);
 
-        character.constructorPatterns.forEach((pattern, i) => {
-            if (pattern instanceof RegExp) {
+        character.argumentPatterns.forEach((pattern) => {
+            if (pattern.pattern instanceof RegExp) {
                 description.attributes.forEach(property => {
-                    const match = property.line.match(pattern);
+                    const match = property.line.match(pattern.pattern as RegExp);
                     if (match) {
-                        args[i] = match[1];
+                        args[pattern.argumentIndex] = match[1];
                     }
                 })
             }
         });
 
-        const obj = new character.ctor(...args);
+        const obj = new character.prototype.constructor(...args);
         return obj;
     }
 }

@@ -61,8 +61,16 @@ export class CharacterDescription implements IDescriptionElement {
     constructor(public readonly line: string, public readonly name: string, public readonly type: string, public readonly attributes: Array<Attribute>) {}
 }
 
+export class Performance {
+    constructor (public readonly line: string, public readonly references: Array<Reference>) {
+        
+    }
+}
+
 export class CharacterCue implements ISection {
     public readonly lines: Array<string> = [];
+    public readonly performances: Array<string> = []
+
     constructor(public readonly line: string, public heading: string, public readonly character: CharacterDescription) {
     }
 }

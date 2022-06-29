@@ -1,11 +1,12 @@
 import { Prop } from "../../src/engine/prop";
 
-@Prop('sword', {appearance: '{0}', sharpness: '{1}'})
-export class Sword {
-    constructor(public appearance, public sharpness) {}
+// 
+@Prop('sword', ['[0]', '[1]'])
+export class Weapon {
+    constructor(public appearance: string, public sharpness: string) {}
 }
 
-@Prop('bucker')
-export class Buckler {
+@Prop('buckler')
+export class Shield {
 
 }

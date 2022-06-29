@@ -1,20 +1,25 @@
-import { Character, Property } from "../../src/engine/character";
-import { Sword } from "./props";
+import { Character, Action, Pattern } from "../../src/engine/character";
+import { Weapon } from "./props";
 
-@Character('man', [/of the house of ([a-zA-Z ]*)$/])
+@Character('man')
 export class Man {
-    @Property('prop')
-    public weapon: Sword;
+    public currentLine: string;
 
-    constructor(public house: string) {
+    constructor(@Pattern(/of the house of ([a-zA-Z ]*)$/) public house: string, public weapon: Weapon) {
 
     }
 
-    //@Action('says {0} to {1}')
-    public Talks(line: string, target: Man) {console.log('talks', line, target)}
+    @Action('says {0} to {1}')
+    public Talks(line: string, target: Man) {
+        this.currentLine = line;
+        console.log('talks', line, target)
+    }
 
-    //@Action()
-    public Dialogue(line: string) {console.log('talks', line)}
+    @Action()
+    public Dialogue(line: string) {
+        this.currentLine = line;
+        console.log('talks', line)
+    }
 
     public Wield() {}
 }

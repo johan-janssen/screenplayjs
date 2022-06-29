@@ -10,7 +10,14 @@ describe("Registry registers actors and props", () =>{
     });
 
     it("Has registered man", () =>{
-        should(GlobalRegistry.getCharactersByPrototype(Man)).lengthOf(1)
-        should(GlobalRegistry.getCharactersByPrototype(Man)[0].type).eql('man')
+        should(GlobalRegistry.GetCharacterByName('man').typeNames).containEql('man')
+        should(GlobalRegistry.GetCharacterByName('man').prototype).eql(Man.prototype)
+    });
+
+    it("Has registered actions of man", () =>{
+        const man = GlobalRegistry.GetCharacterByName('man');
+        should(man.actions).lengthOf(2);
+        should(man.actions.map(a => a.methodName)).containEql('Talks');
+        should(man.actions.map(a => a.methodName)).containEql('Dialogue');
     });
 });
