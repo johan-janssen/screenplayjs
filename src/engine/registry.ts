@@ -19,8 +19,7 @@ export class Method {
 }
 
 
-export class Actor {
-    public readonly actions: Array<Action> = [];
+export class Type {
     public readonly argumentPatterns: Array<ArgumentPattern> = [];
     public readonly methods: Array<Method> = [];
     public readonly typeNames: Array<string> = [];
@@ -32,12 +31,12 @@ export class Actor {
     }
 
     public GetOrCreateMethod(name: string): Method {
-        let methods = this.methods.filter(m => m.name == name);
-        if (methods.length == 1) {
-            return methods[0];
+        let existingMethod = this.methods.filter(m => m.name == name);
+        if (existingMethod.length == 1) {
+            return existingMethod[0];
         }
         const method = new Method(name, this.prototype);
-        methods.push(method);
+        this.methods.push(method);
         return method;
     }
 }
@@ -51,8 +50,8 @@ export class Action {
 }
 
 export class Registry {
-    public readonly typeCharactersMap = new Map<string, Actor>();
-    public readonly objects = new Map<any, Actor>();
+    public readonly typeCharactersMap = new Map<string, Type>();
+    public readonly objects = new Map<any, Type>();
 
     // @ts-ignore
     public Register(type) {}
@@ -67,7 +66,7 @@ export class Registry {
         this.typeCharactersMap.set(type, obj);
     }
 
-    public RegisterAction(pattern: string, target: any, methodName: string) {
+    public RegisterMethod(pattern: string, target: any, methodName: string) {
         const obj = this.GetOrCreateTypeByPrototype(target);
         const method = obj.GetOrCreateMethod(methodName);
         method.Patterns.push(pattern);
@@ -86,7 +85,7 @@ export class Registry {
         }
     }
 
-    public GetCharacterByName(type: string) : Actor {
+    public GetCharacterByName(type: string) : Type {
         const r = this.typeCharactersMap.get(type);
         return r;
     }
@@ -97,14 +96,14 @@ export class Registry {
         //console.log(Reflect.getMetadataKeys(v[1], v[2]));
     }
 
-    public GetOrCreateTypeByPrototype(prototype): Actor {
+    public GetOrCreateTypeByPrototype(prototype): Type {
         if (prototype.prototype) {
             throw 'This is not a prototype';
         }
 
         let r = this.objects.get(prototype);
         if (!r) {
-            r = new Actor(prototype)
+            r = new Type(prototype)
             this.objects.set(prototype, r);
         }
         return r;

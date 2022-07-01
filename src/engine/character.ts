@@ -16,9 +16,9 @@ export function Pattern(patternOrIndex: string|RegExp|number) {
     }
 }
 
-export function Action(pattern: string=null) {
+export function Perform(pattern: string=null) {
     return function(target: any, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) {
-        GlobalRegistry.RegisterAction(pattern, target, propertyKey);
+        GlobalRegistry.RegisterMethod(pattern, target, propertyKey);
         return descriptor
     }
 }

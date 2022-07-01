@@ -1,4 +1,4 @@
-import { Character, Action, Pattern } from "../../src/engine/character";
+import { Character, Perform, Pattern } from "../../src/engine/character";
 import { Weapon } from "./props";
 
 @Character('man')
@@ -9,13 +9,13 @@ export class Man {
 
     }
 
-    @Action('says {0} to {1}')
+    @Perform('says {0} to {1}')
     public Talks(line: string, target: Man) {
         this.currentLine = line;
         console.log('talks', line, target)
     }
 
-    @Action()
+    @Perform()
     public Dialogue(line: string) {
         this.currentLine = line;
         console.log('talks', line)

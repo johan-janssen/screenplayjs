@@ -1,6 +1,5 @@
 import 'reflect-metadata';
-import { CharacterDescription, SceneSection } from '../script/elements';
-import { ScreenPlay } from '../script/loader';
+import { Description, SceneSection, Screenplay } from '../script/elements';
 import { Registry } from './registry';
 import { Set } from './set';
 
@@ -24,7 +23,7 @@ export class Builder {
 
     }
 
-    public buildCharacter(description: CharacterDescription): any {
+    public buildCharacter(description: Description): any {
         const character = this.registry.GetCharacterByName(description.type);
 
         const args = new Array(character.ctorArguments.length);
@@ -49,12 +48,12 @@ export class Director {
     private currentLine = -1;
     private currentScene: SceneSection = null
 
-    constructor(public readonly screenplay: ScreenPlay, public readonly set: Set, public readonly builder: Builder) {
+    constructor(public readonly screenplay: Screenplay, public readonly set: Set, public readonly builder: Builder) {
 
     }
 
     public start() {
-        this.currentScene = this.screenplay.acts[0].scenes[0];
+        this.currentScene = this.screenplay.GetChildren(SceneSection)[0];
         this.currentLine = -1;
         this.next();
     }
@@ -62,12 +61,12 @@ export class Director {
     public next(): boolean {
         this.currentLine++;
 
-        if (this.currentLine >= this.currentScene.actions.length) {
+        if (this.currentLine >= this.currentScene.children.length) {
             return false;
         }
 
-        const line = this.currentScene.actions[this.currentLine];
-        if (line instanceof CharacterDescription) {
+        const line = this.currentScene.children[this.currentLine];
+        if (line instanceof Description) {
             const char = this.builder.buildCharacter(line);
             console.log(char);
         }

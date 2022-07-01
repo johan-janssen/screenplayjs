@@ -1,6 +1,6 @@
 //import { Builder } from 'src/engine/builder';
 import { GlobalRegistry } from '../src/engine/registry';
-import { Attribute, CharacterDescription } from '../src/script/elements';
+import { Attribute, Description } from '../src/script/elements';
 import { Man } from './romeoAndJuliet/actors';
 import { Builder } from '../src/engine/builder'
 import * as should from 'should';
@@ -15,7 +15,7 @@ describe("Builder builds actors and props", () => {
 
     it("Builds a man", () => {
         const line = 'SAMPSON, a man, of the house of Capulet, armed with SWORD and BUCKLER'
-        const description = new CharacterDescription(
+        const description = new Description(
             line, 
             'SAMPSON', 
             'man', 
