@@ -10,7 +10,7 @@ describe("Registry registers actors and props", () =>{
     });
 
     it("Has registered man", () =>{
-        should(GlobalRegistry.GetCharacterByName('man').typeNames).containEql('man')
+        should(GlobalRegistry.GetCharacterByName('man').types).containEql('man')
         should(GlobalRegistry.GetCharacterByName('man').prototype).eql(Man.prototype)
     });
 

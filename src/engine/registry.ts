@@ -19,10 +19,16 @@ export class Method {
 }
 
 
+export interface ITypeDescription {
+    name: string,
+    isUnique: boolean
+}
+
+
 export class Type {
     public readonly argumentPatterns: Array<ArgumentPattern> = [];
     public readonly methods: Array<Method> = [];
-    public readonly typeNames: Array<string> = [];
+    public readonly types: Array<ITypeDescription> = [];
     public readonly ctorArguments: Array<any>;
 
     constructor(public readonly prototype: any) {
@@ -50,20 +56,20 @@ export class Action {
 }
 
 export class Registry {
-    public readonly typeCharactersMap = new Map<string, Type>();
+    public readonly nameToTypeMap = new Map<string, Type>();
     public readonly objects = new Map<any, Type>();
 
-    // @ts-ignore
+    // @ts-ignore, trick to make js load the type and call the attributes
     public Register(type) {}
 
-    public RegisterCharacter(type: string, target: any) {
-        if (this.typeCharactersMap.has(type)) {
-            throw `Cannot register type '${type}' twice`;
+    public RegisterType(name: string, isUnique: boolean, target: any) {
+        if (this.nameToTypeMap.has(name)) {
+            throw `Cannot register type '${name}' twice`;
         }
 
         const obj = this.GetOrCreateTypeByPrototype(target.prototype);
-        obj.typeNames.push(type);
-        this.typeCharactersMap.set(type, obj);
+        obj.types.push({name: name, isUnique: isUnique});
+        this.nameToTypeMap.set(name, obj);
     }
 
     public RegisterMethod(pattern: string, target: any, methodName: string) {
@@ -86,7 +92,7 @@ export class Registry {
     }
 
     public GetCharacterByName(type: string) : Type {
-        const r = this.typeCharactersMap.get(type);
+        const r = this.nameToTypeMap.get(type);
         return r;
     }
 

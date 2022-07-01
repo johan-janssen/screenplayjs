@@ -1,5 +1,8 @@
-export function Prop(type: string, patterns: Array<string|RegExp> = null) {
+import { GlobalRegistry } from "./registry"
+export { Property, Pattern } from './decorators';
+
+export function Prop(type: string, isUnique: boolean=false) {
     return function(target) {
-        console.log(type, patterns, target);
+        GlobalRegistry.RegisterType(type, isUnique, target);
     }
 }

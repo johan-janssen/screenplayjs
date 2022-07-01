@@ -1,18 +1,10 @@
 import 'reflect-metadata';
 import { GlobalRegistry } from './registry';
+export { Property, Pattern } from './decorators';
 
-
-export function Character(type: string) {
+export function Character(type: string, isUnique: boolean=true) {
     return function(target) {
-        Reflect.defineMetadata('Character', 'x', target);
-        GlobalRegistry.RegisterCharacter(type, target);
-    }
-}
-
-export function Pattern(patternOrIndex: string|RegExp|number) {
-    return function(target: any, propertyKey: string, argumentIndex: number) {
-        GlobalRegistry.RegisterArgument(target, propertyKey, argumentIndex, patternOrIndex);
-        console.log(patternOrIndex, target, propertyKey, argumentIndex)
+        GlobalRegistry.RegisterType(type, isUnique, target);
     }
 }
 
@@ -20,11 +12,5 @@ export function Perform(pattern: string=null) {
     return function(target: any, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) {
         GlobalRegistry.RegisterMethod(pattern, target, propertyKey);
         return descriptor
-    }
-}
-
-export function Property(type: string) {
-    return function(target: any, propertyKey: string) {
-        GlobalRegistry.RegisterProperty([type, target, propertyKey]);
     }
 }

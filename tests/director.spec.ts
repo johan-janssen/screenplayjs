@@ -1,4 +1,4 @@
-import { script as script1 } from './script1';
+import { script as script1 } from './romeoAndJuliet/script';
 import { Loader } from '../src/script/loader'
 import {  Builder, Director } from '../src/engine/builder';
 import { Set } from '../src/engine/set';

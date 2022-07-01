@@ -4,9 +4,11 @@ import { Attribute, Description } from '../src/script/elements';
 import { Man } from './romeoAndJuliet/actors';
 import { Builder } from '../src/engine/builder'
 import * as should from 'should';
+import { Weapon } from './romeoAndJuliet/props';
 
 describe("Builder builds actors and props", () => {
     GlobalRegistry.Register(Man);
+    GlobalRegistry.Register(Weapon);
     const builder = new Builder(GlobalRegistry);
 
     before(() => {
@@ -25,4 +27,17 @@ describe("Builder builds actors and props", () => {
         should(built).instanceof(Man)
         should(built.house).equals('Capulet')
     });
+
+    it('builds a sword', () => {
+        const description = new Description(
+            '', 
+            'SWORD', 
+            'sword', 
+            [new Attribute('shiny', []), new Attribute('quite pointy', [])]);
+        const built = builder.buildCharacter(description) as Weapon;
+
+        should(built).instanceof(Weapon)
+        should(built.appearance).equals('shiny')
+        should(built.sharpness).equals('pointy')
+    })
 });

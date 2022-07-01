@@ -1,4 +1,4 @@
-import { script as script1 } from './script1';
+import { script as script1 } from './romeoAndJuliet/script';
 import { Description, PropSection, SceneSection, Screenplay, SetSection} from '../src/script/elements'
 import { Loader } from '../src/script/loader';
 import * as should from 'should';
