@@ -1,20 +1,18 @@
-export class ArgumentPattern {
-    constructor(public readonly propertyKey, public readonly argumentIndex, public readonly pattern: string|RegExp|number) {
-    }
-}
-
-
 export class MethodPattern {
 
 }
 
 
+export class Argument {
+    public readonly patterns: Array<string|RegExp|number> = [];
+    constructor(public readonly prototype: any) {
+
+    }
+}
+
 export class Method {
-    public readonly ArgumentPatterns: Array<ArgumentPattern> = [];
-    public readonly Patterns: Array<MethodPattern> = [];
-    public readonly args: Array<any>;
-    constructor(public readonly name: string, public readonly prototype) {
-        this.args = Reflect.getMetadata('design:paramtypes', prototype, name);
+    public readonly patterns: Array<MethodPattern> = [];
+    constructor(public readonly name: string, public readonly args: Array<Argument>) {
     }
 }
 
@@ -26,32 +24,30 @@ export interface ITypeDescription {
 
 
 export class Type {
-    public readonly argumentPatterns: Array<ArgumentPattern> = [];
     public readonly methods: Array<Method> = [];
     public readonly types: Array<ITypeDescription> = [];
-    public readonly ctorArguments: Array<any>;
+    public constructorMethod: Method;
 
-    constructor(public readonly prototype: any) {
-        const args = Reflect.getMetadata('design:paramtypes', prototype);
-        this.ctorArguments = args ? args : [];
+    constructor(public readonly ctor: any) {
     }
 
-    public GetOrCreateMethod(name: string): Method {
+    public GetDescription(name: string): ITypeDescription {
+        return this.types.filter(t => t.name==name)[0];
+    }
+
+    public GetOrCreateMethod(name: string, args: Array<Argument>): Method {
         let existingMethod = this.methods.filter(m => m.name == name);
         if (existingMethod.length == 1) {
             return existingMethod[0];
         }
-        const method = new Method(name, this.prototype);
+        const method = new Method(name, args);
         this.methods.push(method);
+
+        if (!name) {
+            this.constructorMethod = method;
+        }
+
         return method;
-    }
-}
-
-export class Action {
-    public readonly argumentPatterns: Array<ArgumentPattern> = [];
-
-    constructor(public readonly pattern: string, public readonly methodName: string, public parametertypes) {
-
     }
 }
 
@@ -67,31 +63,31 @@ export class Registry {
             throw `Cannot register type '${name}' twice`;
         }
 
-        const obj = this.GetOrCreateTypeByPrototype(target.prototype);
+        const obj = this.GetOrCreateTypeByConstructor(target.prototype.constructor);
+        let args = Reflect.getMetadata('design:paramtypes', target);
+        args = args? args : []
+        obj.GetOrCreateMethod(null, args.map(arg => new Argument(arg)));
         obj.types.push({name: name, isUnique: isUnique});
         this.nameToTypeMap.set(name, obj);
     }
 
     public RegisterMethod(pattern: string, target: any, methodName: string) {
-        const obj = this.GetOrCreateTypeByPrototype(target);
-        const method = obj.GetOrCreateMethod(methodName);
-        method.Patterns.push(pattern);
+        const obj = this.GetOrCreateTypeByConstructor(target.constructor);
+        let args = Reflect.getMetadata('design:paramtypes', target, methodName);
+        args = args? args : []
+        const method = obj.GetOrCreateMethod(methodName, args.map(arg => new Argument(arg)));
+        method.patterns.push(pattern);
     }
 
-    public RegisterArgument(target: any, propertyKey: string, argumentIndex: number, patternOrIndex: string|RegExp|number) {
-        const obj = this.GetOrCreateTypeByPrototype(target.prototype);
-        const argumentPattern = new ArgumentPattern(propertyKey, argumentIndex, patternOrIndex);
-
-        if (propertyKey) {
-            const method = obj.GetOrCreateMethod(propertyKey);
-            method.ArgumentPatterns.push(argumentPattern)
-        }
-        else {
-            obj.argumentPatterns.push(argumentPattern);
-        }
+    public RegisterArgument(target: any, methodName: string, argumentIndex: number, patternOrIndex: string|RegExp|number) {
+        const obj = this.GetOrCreateTypeByConstructor(target.prototype.constructor);
+        let args = Reflect.getMetadata('design:paramtypes', target, methodName);
+        args = args? args : []
+        const method = obj.GetOrCreateMethod(methodName, args.map(arg => new Argument(arg)));
+        method.args[argumentIndex].patterns.push(patternOrIndex);
     }
 
-    public GetCharacterByName(type: string) : Type {
+    public GetTypeByName(type: string) : Type {
         const r = this.nameToTypeMap.get(type);
         return r;
     }
@@ -102,12 +98,12 @@ export class Registry {
         //console.log(Reflect.getMetadataKeys(v[1], v[2]));
     }
 
-    public GetOrCreateTypeByPrototype(prototype): Type {
-        if (prototype.prototype) {
-            throw 'This is not a prototype';
-        }
+    public GetTypeByConstructor(prototype): Type {
+        return this.objects.get(prototype);
+    }
 
-        let r = this.objects.get(prototype);
+    public GetOrCreateTypeByConstructor(prototype): Type {
+        let r = this.GetTypeByConstructor(prototype);
         if (!r) {
             r = new Type(prototype)
             this.objects.set(prototype, r);

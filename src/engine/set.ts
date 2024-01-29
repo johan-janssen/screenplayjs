@@ -8,4 +8,12 @@ export class Set {
     public Add(name, character) {
         this.characters.set(name, character);
     }
+
+    public Has(name) {
+        return this.characters.has(name);
+    }
+
+    public Get(name) {
+        return this.characters.get(name);
+    }
 }

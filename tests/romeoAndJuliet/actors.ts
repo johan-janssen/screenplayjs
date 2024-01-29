@@ -1,12 +1,29 @@
 import { Character, Perform, Pattern } from "../../src/engine/character";
-import { Weapon } from "./props";
+//import { ItemForCombat } from "./props";
+
+export class A {
+
+}
+
+export class B extends A {
+
+}
+
+@Character('Test')
+export class C extends B {
+
+}
+
+export class Human {
+
+}
 
 @Character('man')
-export class Man {
+export class Man extends Human {
     public currentLine: string;
 
-    constructor(@Pattern(/of the house of ([a-zA-Z ]*)$/) public house: string, public weapon: Weapon) {
-
+    constructor(@Pattern(/of the house of ([a-zA-Z ]*)$/) public house: string, public weapon: A) {
+        super()
     }
 
     @Perform('says {0} to {1}')

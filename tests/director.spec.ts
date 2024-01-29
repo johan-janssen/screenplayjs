@@ -9,7 +9,7 @@ import * as should from 'should';
 describe("Director directs script1", () =>{
     let director: Director = null;
     let set: Set = new Set();
-    let builder = new Builder(GlobalRegistry);
+    let builder = new Builder(GlobalRegistry, set);
     GlobalRegistry.Register(Man);
 
     before(() => {

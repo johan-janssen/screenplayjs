@@ -1,46 +1,114 @@
 import 'reflect-metadata';
-import { Description, SceneSection, Screenplay } from '../script/elements';
-import { Registry } from './registry';
+import { Attribute, Description, SceneSection, Screenplay } from '../script/elements';
+import { Argument, Registry } from './registry';
 import { Set } from './set';
 
-export interface Type<T> {
-    new(...args: any[]): T;
-  }
-
-export const Injector = new class {
-    // resolving instances
-    resolve<T>(target: Type<any>): T {
-      // tokens are required dependencies, while injections are resolved tokens from the Injector
-      let tokens = Reflect.getMetadata('design:paramtypes', target) || [],
-          injections = tokens.map(token => Injector.resolve<any>(token));
-      
-      return new target(...injections);
-    }
-  };
-
 export class Builder {
-    constructor(private registry: Registry) {
+    constructor(private registry: Registry, private set: Set) {
 
     }
 
     public buildCharacter(description: Description): any {
-        const character = this.registry.GetCharacterByName(description.type);
+        const type = this.registry.GetTypeByName(description.type);
+        const ctor = type.constructorMethod;
 
-        const args = new Array(character.ctorArguments.length);
+        const constructorArgs = new Array(ctor.args.length);
 
-        character.argumentPatterns.forEach((pattern) => {
-            if (pattern.pattern instanceof RegExp) {
-                description.attributes.forEach(property => {
-                    const match = property.line.match(pattern.pattern as RegExp);
-                    if (match) {
-                        args[pattern.argumentIndex] = match[1];
-                    }
-                })
+        ctor.args.forEach((arg, i) => {
+            const attribute = this.GetAttribute(arg, description.attributes);
+            if (attribute) {
+                constructorArgs[i] = attribute.value;
             }
-        });
+        })
 
-        const obj = new character.prototype.constructor(...args);
+        // ctor.args.forEach((arg, i) => {
+        //     if (!constructorArgs[i]) {
+
+        //     }
+        // });
+
+        const obj = new type.ctor(...constructorArgs);
         return obj;
+    }
+
+    // public FindReferencedObjectByPrototype(prototype, attributes: Array<Attribute>) {
+    //     const t = this.registry.GetTypeByPrototype(prototype);
+    // }
+
+    public GetAllReferencedObjects(attributes: Array<Attribute>) {
+        const referenced = [];
+        attributes.forEach(attr => {
+            attr.references.forEach(ref => {
+                const element = ref.element as Description;
+                const referencedType = this.registry.GetTypeByName(element.type);
+                const typeDescription = referencedType.GetDescription(element.type);
+                if (typeDescription.isUnique) {
+                    let obj = this.set.Get(element.name);
+                    if (!obj) {
+                        obj = this.buildCharacter(element);
+                        this.set.Add(element.name, obj);
+                    }
+                    referenced.push(obj);
+                }
+                else {
+                    referenced.push(this.buildCharacter(element));
+                }
+            })
+        });
+    }
+
+    public GetAttribute(arg: Argument, attributes: Array<Attribute>): {attribute: Attribute, pattern, match, value}|null {
+        let foundAttr;
+        for (let i=0; i<attributes.length; i++) {
+            const attribute = attributes[i]
+            const match = this.MatchAttributeToPatterns(arg, attribute);
+            if (match) {
+                foundAttr = {attribute: attribute, pattern: match.pattern, match: match.match, value: match.value };
+            }
+        }
+
+        if (!foundAttr) {
+            for (let i=0; i<attributes.length; i++) {
+                const attribute = attributes[i]
+                this.MatchAttributeToType(arg, attribute);
+            }
+        }
+
+        return foundAttr;
+    }
+
+    public MatchAttributeToPatterns(arg: Argument, attribute: Attribute): {pattern, match, value}|null {
+        for (let i=0; i<arg.patterns.length; i++) {
+            const pattern = arg.patterns[i];
+            const match = attribute.line.match(pattern as RegExp);
+            if (match) {
+                return {pattern: pattern, match: match, value: match[1]}
+            }
+        }
+        return null;
+    }
+
+    public MatchAttributeToType(arg: Argument, attribute: Attribute) {
+        const t = this.registry.GetTypeByConstructor(arg.prototype);
+        for (let i=0; i<attribute.references.length; i++) {
+            const reference = attribute.references[i];
+            const element = reference.element as Description;
+            const referencedType = this.registry.GetTypeByName(element.type);
+            const proto1 = arg.prototype;
+            let proto2 = referencedType.ctor;
+
+            while (proto2) {
+               const match = proto1 == proto2;
+               
+               console.log(match);
+               if (match) {
+                   break;
+               }
+               proto2 = proto2.__proto__;
+            }
+            
+        }
+        console.log(arg, attribute, t);
     }
 }
 
